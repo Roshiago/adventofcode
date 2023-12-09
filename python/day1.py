@@ -17,57 +17,62 @@ def parse_puzzle(puzzle: ty.Sequence[str]) -> int:
     for line in puzzle:
         value = None
 
-        max_idx, max_num = -1, -1
+        right_idx, right_number = -1, -1
+        left_idx, left_number = 99999, 99999
 
-        min_idx, min_num = len(line), len(line)
-        for wnum in num2digit:
-            left_idx = line.find(wnum)
-            right_idx = line.rfind(wnum)
-            if left_idx == -1 and right_idx == -1:
+        for char_num in num2digit:
+            left_find_idx = line.find(char_num)
+            right_find_idx = line.rfind(char_num)
+            if left_find_idx == -1 and right_find_idx == -1:
                 continue
-            
-            pull = []
-            if left_idx != -1:
-                pull.append(left_idx)
-            
-            if right_idx != -1:
-                pull.append(right_idx)
 
-            for wnum_idx in pull:
-                if max_idx < wnum_idx:
-                    max_idx = wnum_idx
-                    max_num = num2digit[wnum]
-                
-                if min_idx > wnum_idx:
-                    min_idx = wnum_idx
-                    min_num = num2digit[wnum]
+            pull = []
+            if left_find_idx != -1:
+                pull.append(left_find_idx)
+
+            if right_find_idx != -1:
+                pull.append(right_find_idx)
+
+            for char_num_idx in pull:
+                if right_idx <= char_num_idx:
+                    right_idx = char_num_idx
+                    right_number = num2digit[char_num]
+
+                if left_idx >= char_num_idx:
+                    left_idx = char_num_idx
+                    left_number = num2digit[char_num]
 
         for idx, c in enumerate(line):
             if not c.isdigit():
                 continue
 
-            if min_idx is not None and idx < min_idx:
-                min_idx = idx
-                min_num = int(c)
-            elif min_idx is None:
-                min_idx = idx
-                min_num = int(c)
+            if left_idx is not None and idx < left_idx:
+                left_idx = idx
+                left_number = int(c)
+            elif left_idx is None:
+                left_idx = idx
+                left_number = int(c)
 
-            if max_idx is not None and idx > max_idx:
-                max_idx = idx
-                max_num = int(c)
-            elif max_idx is None:
-                max_idx = idx
-                max_num = int(c)
+            if right_idx is not None and idx > right_idx:
+                right_idx = idx
+                right_number = int(c)
+            elif right_idx is None:
+                right_idx = idx
+                right_number = int(c)
 
-        value = min_num * 10 + max_num
+        value = left_number * 10 + right_number
         result += value
 
     return result
 
 
-with open("day1.txt") as f:
-    puzzle = f.readlines()
+def main():
+    with open("day1.txt") as f:
+        puzzle = f.readlines()
 
-result = parse_puzzle(puzzle)
-print("RESULT: ", result)
+    result = parse_puzzle(puzzle)
+    print("RESULT: ", result)
+
+
+if __name__ == "__main__":
+    main()
