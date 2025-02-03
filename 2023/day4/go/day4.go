@@ -132,47 +132,37 @@ func part2() {
 
 	result := 0;
 
+	queue := []Pair {};
+
 	for _, card := range saved_cards {
 		result += 1;
-		card_num := card.card_num.(int32);
 		winning_count := card.winning_count.(int32);
 
-		if (winning_count < 0) {
+		if (winning_count == 0) {
 			continue;
 		}
 
-		queue := []Pair {};
+		queue = append(queue, card);
+	}
 
-		var i int32 = 1;
-		for ; i <= winning_count; i++ {
-			next_card_idx := card_num + i;
-			next_card := saved_cards[next_card_idx];
+	for len(queue) > 0 {
+		card := queue[0];
+		queue = queue[1:];
+
+		card_num := card.card_num.(int32);
+		winning_count := card.winning_count.(int32);
+
+	    var i int32 = 1;
+	    for ; i <= winning_count; i++ {
+	    	next_card_idx := card_num + i;
+	    	next_card := saved_cards[next_card_idx];
 
 			result += 1;
 
-			if (next_card.winning_count.(int32) > 0) {
-				queue = append(queue, next_card);
+	    	if (next_card.winning_count.(int32) > 0) {
+	    		queue = append(queue, next_card);
 			}
-		}
-
-		for len(queue) > 0 {
-			card, queue = queue[0], queue[1:];
-
-			card_num := card.card_num.(int32);
-			winning_count := card.winning_count.(int32);
-
-		    var i int32 = 1;
-		    for ; i <= winning_count; i++ {
-		    	next_card_idx := card_num + i;
-		    	next_card := saved_cards[next_card_idx];
-
-				result += 1;
-
-		    	if (next_card.winning_count.(int32) > 0) {
-		    		queue = append(queue, next_card);
-				}
-		    }
-		}
+	    }
 	}
 
 	fmt.Println("Part 2:", result);
