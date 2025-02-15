@@ -1,12 +1,16 @@
 ---@type function
 ---@param file string
+---@return boolean
 local function file_exists(file)
     local f = io.open(file, "rb")
     if f then f:close() end
     return f ~= nil
 end
 
+
+---@type function
 ---@param numbers string
+---@return table
 local function parse_numbers(numbers)
     local parsed = {}
     for n in numbers:gmatch("(%d+)") do
@@ -16,7 +20,10 @@ local function parse_numbers(numbers)
     return parsed
 end
 
+
+---@type function
 ---@param key string
+---@return table
 local function parse_key(key)
     local fr_to = {};
     for k in key:gmatch("(%w+)") do
@@ -27,6 +34,8 @@ local function parse_key(key)
     return fr_to
 end
 
+
+---@type function
 ---@param key string
 ---@return integer, integer, integer 
 local function parse_map_key(key)
@@ -81,64 +90,62 @@ local function parse_file(file)
 
     return glossary, seeds, order
 end
-  
 
-local file = './2023/day5/day5.txt'
-local glossary, seeds, order = parse_file(file)
 
-local lowest_location = math.tointeger(-1)
+---@type function
+---@param file string
+---@return integer?
+local function part1(file)
+    local glossary, seeds, order = parse_file(file)
 
-for i = 1, #seeds do
-    local seed = math.tointeger(seeds[i])
-    print("For seed:" .. seed)
-    local next_dest = seed
-    for j = 1, #order do
-        local fr, to = table.unpack(order[j])
-        local t = glossary[fr][to]
+    local lowest_location = math.tointeger(-1)
 
-        local find = false
-        print("==============".. fr .. " to " .. to .. "==============")
-        for k = 1, #t do
-            local source, dest, step = parse_map_key(t[k])
-            if next_dest >= source and next_dest < (source + step) then
-                print("Find " .. fr .. " at " .. next_dest)
-                local delta = next_dest - source
-                next_dest = dest + delta
-                find = true
-                print("Next " .. to .. " is (" .. next_dest ..  "):" .. source .. ":" .. dest .. ":" .. step)
-                goto continue
+    for i = 1, #seeds do
+        local seed = math.tointeger(seeds[i])
+        print("For seed:" .. seed)
+        local next_dest = seed
+        for j = 1, #order do
+            local fr, to = table.unpack(order[j])
+            local t = glossary[fr][to]
+
+            local find = false
+            print("==============".. fr .. " to " .. to .. "==============")
+            for k = 1, #t do
+                local source, dest, step = parse_map_key(t[k])
+                if next_dest >= source and next_dest < (source + step) then
+                    print("Find " .. fr .. " at " .. next_dest)
+                    local delta = next_dest - source
+                    next_dest = dest + delta
+                    find = true
+                    print("Next " .. to .. " is (" .. next_dest ..  "):" .. source .. ":" .. dest .. ":" .. step)
+                    goto continue
+                end
             end
+
+            ::continue::
+
+            if find ~= true then
+                print("Find " .. fr .. " at " .. next_dest)
+                print("Next " .. to .. " is " .. next_dest)
+            end
+
         end
 
-        ::continue::
-
-        if find ~= true then
-            print("Find " .. fr .. " at " .. next_dest)
-            print("Next " .. to .. " is " .. next_dest)
+        if lowest_location == -1 then
+            lowest_location = next_dest
         end
 
+        if lowest_location > next_dest then
+            lowest_location = next_dest
+        end
+
+        print("")
     end
 
-    if lowest_location == -1 then
-        lowest_location = next_dest
-    end
+    print("Lowest location is " .. lowest_location)
 
-    if lowest_location > next_dest then
-        lowest_location = next_dest
-    end
-
-    print("")
+    return lowest_location
 end
 
-print("Lowest location is " .. lowest_location)
 
--- glossary
--- fr -> to -> [v...]
-
--- seeds
--- 1 -> i, 2 -> j, ...
-
--- order
--- 1 -> (fr, to), 2 -> (fr, to), ...
-
-
+part1('./2023/day5/day5.txt')
